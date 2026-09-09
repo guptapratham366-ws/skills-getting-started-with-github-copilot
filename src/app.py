@@ -60,7 +60,7 @@ activities = {
     "Drama Club": {
         "description": "Perform plays and build confidence through theater",
         "schedule": "Thursdays, 3:30 PM - 5:00 PM",
-        "max_participants":  twenty,
+        "max_participants": 20,
         "participants": []
     },
     "Debate Club": {
@@ -86,6 +86,20 @@ def root():
 @app.get("/activities")
 def get_activities():
     return activities
+
+
+@app.delete("/activities/{activity_name}/participants/{email}")
+def unregister_from_activity(activity_name: str, email: str):
+    """Remove a student from an activity"""
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+
+    activity = activities[activity_name]
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Student is not signed up for this activity")
+
+    activity["participants"].remove(email)
+    return {"message": f"Unregistered {email} from {activity_name}"}
 
 
 @app.post("/activities/{activity_name}/signup")
